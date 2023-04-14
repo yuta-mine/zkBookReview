@@ -1,4 +1,4 @@
-import { Field, SmartContract, state, State, method, Poseidon } from 'snarkyjs';
+import { Field, SmartContract, state, State, method } from 'snarkyjs';
 
 export class BookReview extends SmartContract {
   // On-chain state definitions

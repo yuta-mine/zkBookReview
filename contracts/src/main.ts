@@ -22,8 +22,6 @@ const { privateKey: deployerKey, publicKey: deployerAccount } =
 const { privateKey: senderKey, publicKey: senderAccount } =
   Local.testAccounts[1];
 
-const salt = Field.random();
-
 // ----------------------------------------------------
 
 // create a destination we will deploy the smart contract to
