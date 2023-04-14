@@ -7,7 +7,6 @@ import {
   PrivateKey,
   PublicKey,
   Poseidon,
-  Circuit,
 } from 'snarkyjs';
 
 export class BookReview extends SmartContract {
@@ -18,16 +17,32 @@ export class BookReview extends SmartContract {
   @state(Field) verifiedCId3 = State<Field>();
   @state(Field) verifiedCId4 = State<Field>();
   @state(Field) verifiedCId5 = State<Field>();
-  @state(Field) verifiedCId6 = State<Field>();
-  @state(Field) verifiedCId7 = State<Field>();
+  @state(PublicKey) adminAccount = State<PublicKey>();
+
+  @method setAdminAccount(privateKey: PrivateKey) {
+    const adminAccount = this.adminAccount.get();
+    this.adminAccount.assertEquals(adminAccount);
+
+    this.adminAccount.assertEquals(PublicKey.empty());
+    this.adminAccount.set(privateKey.toPublicKey());
+  }
 
   @method setSecret(
     secret1: Field,
     secret2: Field,
     secret3: Field,
     secret4: Field,
-    secret5: Field
+    secret5: Field,
+    privateKey: PrivateKey
   ) {
+    const x = this.x.get();
+    this.x.assertEquals(x);
+    this.x.assertEquals(Field(0));
+
+    const adminAccount = this.adminAccount.get();
+    this.adminAccount.assertEquals(adminAccount);
+    this.adminAccount.assertEquals(privateKey.toPublicKey());
+
     this.x.set(Poseidon.hash([secret1, secret2, secret3, secret4, secret5]));
   }
 
@@ -139,49 +154,5 @@ export class BookReview extends SmartContract {
     this.verifiedCId5.assertEquals(Field(0));
 
     this.verifiedCId5.set(cId);
-  }
-
-  @method proveReading6(
-    cId: Field,
-    secret1: Field,
-    secret2: Field,
-    secret3: Field,
-    secret4: Field,
-    secret5: Field
-  ) {
-    const x = this.x.get();
-    this.x.assertEquals(x);
-
-    Poseidon.hash([secret1, secret2, secret3, secret4, secret5]).assertEquals(
-      x
-    );
-
-    const verifiedCId6 = this.verifiedCId6.get();
-    this.verifiedCId6.assertEquals(verifiedCId6);
-    this.verifiedCId6.assertEquals(Field(0));
-
-    this.verifiedCId6.set(cId);
-  }
-
-  @method proveReading7(
-    cId: Field,
-    secret1: Field,
-    secret2: Field,
-    secret3: Field,
-    secret4: Field,
-    secret5: Field
-  ) {
-    const x = this.x.get();
-    this.x.assertEquals(x);
-
-    Poseidon.hash([secret1, secret2, secret3, secret4, secret5]).assertEquals(
-      x
-    );
-
-    const verifiedCId7 = this.verifiedCId7.get();
-    this.verifiedCId7.assertEquals(verifiedCId7);
-    this.verifiedCId7.assertEquals(Field(0));
-
-    this.verifiedCId7.set(cId);
   }
 }
