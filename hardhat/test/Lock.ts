@@ -1,124 +1,101 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Lock", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const ONE_GWEI = 1_000_000_000;
 
-    const lockedAmount = ONE_GWEI;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
+describe("BookReview", function () {
+  let BookReview;
+  let bookReview;
+  let owner;
+  let addr1;
+  let addr2;
+  let addrs;
 
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await ethers.getSigners();
+  beforeEach(async function () {
+    BookReview = await ethers.getContractFactory("BookReview");
+    [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+    bookReview = await BookReview.deploy();
+    await bookReview.deployed();
+  });
 
-    const Lock = await ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  describe("Adding a book", function () {
+    it("Should add a book only by the owner", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+      const book = await bookReview.books(1);
+      expect(book.title).to.equal("Book 1");
 
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
-  }
-
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.unlockTime()).to.equal(unlockTime);
-    });
-
-    it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.owner()).to.equal(owner.address);
-    });
-
-    it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
-
-      expect(await ethers.provider.getBalance(lock.address)).to.equal(
-        lockedAmount
-      );
-    });
-
-    it("Should fail if the unlockTime is not in the future", async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        "Unlock time should be in the future"
-      );
+      await expect(bookReview.connect(addr1).addBook("Book 2")).to.be.revertedWith("Caller is not the owner.");
     });
   });
 
-  describe("Withdrawals", function () {
-    describe("Validations", function () {
-      it("Should revert with the right error if called too soon", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+  describe("Adding a comment", function () {
+    it("Should add a comment to an existing book", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
-
-      it("Should revert with the right error if called from another account", async function () {
-        const { lock, unlockTime, otherAccount } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        // We can increase the time in Hardhat Network
-        await time.increaseTo(unlockTime);
-
-        // We use lock.connect() to send a transaction from another account
-        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
-        );
-      });
-
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-        const { lock, unlockTime } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        // Transactions are sent using the first signer by default
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).not.to.be.reverted;
-      });
+      await bookReview.connect(addr1).addComment(1, "Great book!", addr1.address);
+      const comment = await bookReview.comments(1);
+      expect(comment.content).to.equal("Great book!");
     });
 
-    describe("Events", function () {
-      it("Should emit an event on withdrawals", async function () {
-        const { lock, unlockTime, lockedAmount } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw())
-          .to.emit(lock, "Withdrawal")
-          .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-      });
-    });
-
-    describe("Transfers", function () {
-      it("Should transfer the funds to the owner", async function () {
-        const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
-      });
+    it("Should fail when adding a comment to a non-existing book", async function () {
+      await expect(bookReview.connect(addr1).addComment(1, "Great book!", addr1.address)).to.be.revertedWith("Invalid Book ID.");
     });
   });
+
+  describe("Checking if a book is reviewed", function () {
+    it("Should return true if a book has been reviewed", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+      await bookReview.connect(addr1).addComment(1, "Great book!", addr1.address);
+
+      const isReviewed = await bookReview.isBookReviewed(1);
+      expect(isReviewed).to.equal(true);
+    });
+
+    it("Should return false if a book has not been reviewed", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+
+      const isReviewed = await bookReview.isBookReviewed(1);
+      expect(isReviewed).to.equal(false);
+    });
+  });
+
+  describe("Getting comments by book", function () {
+    it("Should return the list of comments for a book", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+      await bookReview.connect(addr1).addComment(1, "Great book!", addr1.address);
+      await bookReview.connect(addr2).addComment(1, "Interesting read.", addr2.address);
+
+      const commentIds = await bookReview.getCommentsByBook(1);
+      expect(commentIds.length).to.equal(2);
+    });
+
+    it("Should return an empty list if there are no comments for a book", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+
+      const commentIds = await bookReview.getCommentsByBook(1);
+      expect(commentIds.length).to.equal(0);
+    });
+  });
+
+  describe("Getting comments by IDs", function () {
+    it("Should return the list of comments by IDs", async function () {
+      await bookReview.connect(owner).addBook("Book 1");
+      await bookReview.connect(addr1).addComment(1, "Great book!", addr1.address);
+      await bookReview.connect(addr2).addComment(1, "Interesting read.", addr2.address);
+
+      const commentIds = [1, 2];
+      const comments = await bookReview.getCommentsByIds(commentIds);
+
+      expect(comments.length).to.equal(2);
+      expect(comments[0].content).to.equal("Great book!");
+      expect(comments[1].content).to.equal("Interesting read.");
+    });
+
+    it("Should return an empty list if there are no valid IDs", async function () {
+      const invalidCommentIds = [10000, 20000];
+      const comments = await bookReview.getCommentsByIds(invalidCommentIds);
+
+      expect(comments.length).to.equal(0);
+    });
+  });
+
 });
