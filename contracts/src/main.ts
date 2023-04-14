@@ -1,4 +1,4 @@
-import { BookReview } from './BookReview.js';
+import { MessageBoard } from './BBS.js';
 import {
   isReady,
   shutdown,
@@ -22,37 +22,113 @@ const { privateKey: deployerKey, publicKey: deployerAccount } =
 const { privateKey: senderKey, publicKey: senderAccount } =
   Local.testAccounts[1];
 
-// ----------------------------------------------------
+const deployerAcc = Local.testAccounts[0].privateKey;
+const Bob = Local.testAccounts[1].privateKey;
+const SuperBob = Local.testAccounts[2].privateKey;
+const MegaBob = Local.testAccounts[3].privateKey;
+const Jack = Local.testAccounts[4].privateKey;
+let users = [Bob, SuperBob, MegaBob, Jack];
 
-// create a destination we will deploy the smart contract to
 const zkAppPrivateKey = PrivateKey.random();
 const zkAppAddress = zkAppPrivateKey.toPublicKey();
 
-const zkAppInstance = new BookReview(zkAppAddress);
+const zkAppInstance = new MessageBoard(zkAppAddress);
 const deployTxn = await Mina.transaction(deployerAccount, () => {
   AccountUpdate.fundNewAccount(deployerAccount);
   zkAppInstance.deploy();
 });
-await deployTxn.prove();
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
+console.log('the message on chain is:', zkAppInstance.message1.get().toString());
 
-console.log('the message on chain is:', zkAppInstance.message.get().toString());
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.myinit(
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+} catch (e) {
+  console.log(e);
+}
 
-// ----------------------------------------------------
+const secret1 = Encoding.stringToFields('secret')[0]
 
-const txn1 = await Mina.transaction(senderAccount, () => {
-  zkAppInstance.updateMessage(
-    Field(Encoding.stringToFields('Hello Mina!!')[0])
-  );
-});
-await txn1.prove();
-await txn1.sign([senderKey]).send();
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.setSecret(
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+} catch (e) {
+  console.log(e);
+}
 
-const updatedMessage = zkAppInstance.message.get();
-console.log('state after txn1:', Encoding.stringFromFields([updatedMessage]));
 
-// ----------------------------------------------------
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.publishMessage(
+      Field(Encoding.stringToFields('Hello Mina!!')[0]),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const field2 = zkAppInstance.message1.get();
+  console.log('the message on chain is:', Encoding.stringFromFields([field2]));
+} catch (e) {
+  console.log(e);
+}
 
-console.log('Shutting down');
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.publishMessage(
+      Field(Encoding.stringToFields('2nd message here is!')[0]),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const field2 = zkAppInstance.message2.get();
+  console.log('the 2nd message on chain is:', Encoding.stringFromFields([field2]));
+} catch (e) {
+  console.log(e);
+}
 
+// try {
+//   const tx1 = await Mina.transaction(senderAccount, () => {
+//     zkAppInstance.publishMessage(
+//       Field(Encoding.stringToFields('Hello Mina!!')[0]),
+//       Field(777),
+//     );
+//   });
+//   await tx1.prove();
+//   await tx1.sign([senderKey]).send();
+//   const field2 = zkAppInstance.message.get();
+//   const txt = zkAppInstance.message.get().toString();
+//   console.log('the message on chain is:', Encoding.stringFromFields([field2]));
+// } catch (e) {
+//   console.log("___________expected_err____________")
+//   console.log(e);
+// }
+
+//
+//
+// console.log('Shutting down');
+//
 await shutdown();
+
+
