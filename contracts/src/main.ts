@@ -1,4 +1,4 @@
-import { BookReview } from './BBS.js';
+import { BookReview } from './BookReview.js';
 import {
   isReady,
   shutdown,
@@ -38,12 +38,14 @@ const deployTxn = await Mina.transaction(deployerAccount, () => {
   zkAppInstance.deploy();
 });
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
-console.log('the message on chain is:', zkAppInstance.message1.get().toString());
+console.log(
+  'the message on chain is:',
+  zkAppInstance.message1.get().toString()
+);
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.myinit(
-    );
+    zkAppInstance.myinit();
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -51,7 +53,7 @@ try {
   console.log(e);
 }
 
-const secret1 = Encoding.stringToFields('secret')[0]
+const secret1 = Encoding.stringToFields('secret')[0];
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
@@ -60,7 +62,7 @@ try {
       Field(secret1),
       Field(secret1),
       Field(secret1),
-      Field(secret1),
+      Field(secret1)
     );
   });
   await tx1.prove();
@@ -68,7 +70,6 @@ try {
 } catch (e) {
   console.log(e);
 }
-
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
@@ -78,7 +79,7 @@ try {
       Field(secret1),
       Field(secret1),
       Field(secret1),
-      Field(secret1),
+      Field(secret1)
     );
   });
   await tx1.prove();
@@ -97,13 +98,16 @@ try {
       Field(secret1),
       Field(secret1),
       Field(secret1),
-      Field(secret1),
+      Field(secret1)
     );
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
   const field2 = zkAppInstance.message2.get();
-  console.log('the 2nd message on chain is:', Encoding.stringFromFields([field2]));
+  console.log(
+    'the 2nd message on chain is:',
+    Encoding.stringFromFields([field2])
+  );
 } catch (e) {
   console.log(e);
 }
@@ -130,5 +134,3 @@ try {
 // console.log('Shutting down');
 //
 await shutdown();
-
-
