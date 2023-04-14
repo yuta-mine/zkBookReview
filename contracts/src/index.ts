@@ -1,3 +1,3 @@
-import { BookReview } from './bookReview.js';
+import { BookReview } from './BookReview.js';
 
 export { BookReview };
