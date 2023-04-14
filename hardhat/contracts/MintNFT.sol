@@ -2,7 +2,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract BookReview is ERC721 {
+contract MintNFT is ERC721 {
     constructor() ERC721("MintNFT", "MintNFT") {
          owner = msg.sender;
     }
@@ -51,7 +51,7 @@ contract BookReview is ERC721 {
          comments[commentId] = Comment(commentId, _bookId, _content, _reviewer);
      }
 
-     function isBookReviewed(uint256 _bookId) public view returns (bool) {
+     function isMintNFTed(uint256 _bookId) public view returns (bool) {
          for (uint256 i = 1; i < nextCommentId; i++) {
              if (comments[i].bookId == _bookId) {
                  return true;
