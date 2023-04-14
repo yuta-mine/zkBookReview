@@ -22,13 +22,6 @@ const { privateKey: deployerKey, publicKey: deployerAccount } =
 const { privateKey: senderKey, publicKey: senderAccount } =
   Local.testAccounts[1];
 
-const deployerAcc = Local.testAccounts[0].privateKey;
-const Bob = Local.testAccounts[1].privateKey;
-const SuperBob = Local.testAccounts[2].privateKey;
-const MegaBob = Local.testAccounts[3].privateKey;
-const Jack = Local.testAccounts[4].privateKey;
-let users = [Bob, SuperBob, MegaBob, Jack];
-
 const zkAppPrivateKey = PrivateKey.random();
 const zkAppAddress = zkAppPrivateKey.toPublicKey();
 
@@ -39,19 +32,19 @@ const deployTxn = await Mina.transaction(deployerAccount, () => {
 });
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
 console.log(
-  'the message on chain is:',
-  zkAppInstance.message1.get().toString()
+  'the commentId on verifiedCId1:',
+  zkAppInstance.verifiedCId1.get().toString()
 );
 
-try {
-  const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.myinit();
-  });
-  await tx1.prove();
-  await tx1.sign([senderKey]).send();
-} catch (e) {
-  console.log(e);
-}
+// try {
+//   const tx1 = await Mina.transaction(senderAccount, () => {
+//     zkAppInstance.myinit();
+//   });
+//   await tx1.prove();
+//   await tx1.sign([senderKey]).send();
+// } catch (e) {
+//   console.log(e);
+// }
 
 const secret1 = Encoding.stringToFields('secret')[0];
 
@@ -73,8 +66,8 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.publishMessage(
-      Field(Encoding.stringToFields('Hello Mina!!')[0]),
+    zkAppInstance.proveReading1(
+      Field(1),
       Field(secret1),
       Field(secret1),
       Field(secret1),
@@ -84,16 +77,16 @@ try {
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
-  const field2 = zkAppInstance.message1.get();
-  console.log('the message on chain is:', Encoding.stringFromFields([field2]));
+  const cId1 = zkAppInstance.verifiedCId1.get();
+  console.log('the commentId on verifiedCId1:', cId1.toString());
 } catch (e) {
   console.log(e);
 }
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.publishMessage(
-      Field(Encoding.stringToFields('2nd message here is!')[0]),
+    zkAppInstance.proveReading2(
+      Field(2),
       Field(secret1),
       Field(secret1),
       Field(secret1),
@@ -103,34 +96,124 @@ try {
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
-  const field2 = zkAppInstance.message2.get();
-  console.log(
-    'the 2nd message on chain is:',
-    Encoding.stringFromFields([field2])
-  );
+  const cId2 = zkAppInstance.verifiedCId2.get();
+  console.log('the commentId on verifiedCId2:', cId2.toString());
 } catch (e) {
   console.log(e);
 }
 
-// try {
-//   const tx1 = await Mina.transaction(senderAccount, () => {
-//     zkAppInstance.publishMessage(
-//       Field(Encoding.stringToFields('Hello Mina!!')[0]),
-//       Field(777),
-//     );
-//   });
-//   await tx1.prove();
-//   await tx1.sign([senderKey]).send();
-//   const field2 = zkAppInstance.message.get();
-//   const txt = zkAppInstance.message.get().toString();
-//   console.log('the message on chain is:', Encoding.stringFromFields([field2]));
-// } catch (e) {
-//   console.log("___________expected_err____________")
-//   console.log(e);
-// }
+try {
+  const cId2 = zkAppInstance.verifiedCId2.get();
+  if (cId2.toString() === '0') {
+    const tx1 = await Mina.transaction(senderAccount, () => {
+      zkAppInstance.proveReading2(
+        Field(2),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1)
+      );
+    });
+    await tx1.prove();
+    await tx1.sign([senderKey]).send();
 
-//
-//
-// console.log('Shutting down');
-//
+    const _cId2 = zkAppInstance.verifiedCId2.get();
+    console.log('the commentId on verifiedCId2:', _cId2.toString());
+  } else {
+    const tx1 = await Mina.transaction(senderAccount, () => {
+      zkAppInstance.proveReading3(
+        Field(3),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1),
+        Field(secret1)
+      );
+    });
+    await tx1.prove();
+    await tx1.sign([senderKey]).send();
+    const cId3 = zkAppInstance.verifiedCId3.get();
+    console.log('the commentId on verifiedCId3:', cId3.toString());
+  }
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading4(
+      Field(4),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId4 = zkAppInstance.verifiedCId4.get();
+  console.log('the commentId on verifiedCId2:', cId4.toString());
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading5(
+      Field(5),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId5 = zkAppInstance.verifiedCId5.get();
+  console.log('the commentId on verifiedCId2:', cId5.toString());
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading6(
+      Field(6),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId6 = zkAppInstance.verifiedCId6.get();
+  console.log('the commentId on verifiedCId2:', cId6.toString());
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading7(
+      Field(7),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId7 = zkAppInstance.verifiedCId7.get();
+  console.log('the commentId on verifiedCId2:', cId7.toString());
+} catch (e) {
+  console.log(e);
+}
+
 await shutdown();
