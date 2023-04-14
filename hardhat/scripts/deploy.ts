@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const MintNFT = await ethers.getContractFactory('MintNFT');
+  const MintNFT = await ethers.getContractFactory('BookReview');
   const mintNFT = await MintNFT.deploy();
   console.log('MyNFT deployed to:', mintNFT.address);
 
