@@ -1,4 +1,4 @@
-import { MessageBoard } from './BBS.js';
+import { BookReview } from './BBS.js';
 import {
   isReady,
   shutdown,
@@ -32,7 +32,7 @@ let users = [Bob, SuperBob, MegaBob, Jack];
 const zkAppPrivateKey = PrivateKey.random();
 const zkAppAddress = zkAppPrivateKey.toPublicKey();
 
-const zkAppInstance = new MessageBoard(zkAppAddress);
+const zkAppInstance = new BookReview(zkAppAddress);
 const deployTxn = await Mina.transaction(deployerAccount, () => {
   AccountUpdate.fundNewAccount(deployerAccount);
   zkAppInstance.deploy();

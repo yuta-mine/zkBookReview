@@ -9,7 +9,7 @@ import {
   Poseidon,
 } from 'snarkyjs';
 
-export class MessageBoard extends SmartContract {
+export class BookReview extends SmartContract {
   // On-chain state definitions
   @state(Field) message1 = State<Field>();
   @state(Field) message2 = State<Field>();
