@@ -9,3 +9,5 @@ contract MintNFT is ERC721 {
         _mint(to, tokenId);
     }
 }
+
+// NFT address is 0x9E4E8b56466B77EBaBA538eeFb3f90b52179CEef
