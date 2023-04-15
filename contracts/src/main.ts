@@ -33,16 +33,11 @@ const deployTxn = await Mina.transaction(deployerAccount, () => {
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
 
 const secret1 = Encoding.stringToFields('secret')[0];
+console.log('secret1', secret1.toString());
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.setSecret(
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.setSecret(secret1, secret1, secret1, secret1, secret1);
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -56,11 +51,11 @@ try {
   const tx1 = await Mina.transaction(senderAccount, () => {
     zkAppInstance.proveReading1(
       Field(1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
+      secret1,
+      secret1,
+      secret1,
+      secret1,
+      secret1
     );
   });
   await tx1.prove();
