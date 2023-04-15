@@ -1,7 +1,9 @@
-import { NFTList} from '../components/nft-list'
+import { NFTList } from '../components/nft-list'
 
 export default function NftList() {
   return (
-    <NFTList />
+    <div>
+      <NFTList />
+    </div>
   );
 }
