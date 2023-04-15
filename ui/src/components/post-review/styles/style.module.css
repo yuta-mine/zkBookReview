@@ -1,0 +1,22 @@
+.container {
+  justify-content: center;
+  align-items: center;
+    width: 20rem;
+}
+
+.tokenInfo {
+  margin: 1rem;
+  display: flex;
+}
+
+.form {
+  width: 10rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}

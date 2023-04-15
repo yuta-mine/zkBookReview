@@ -1,10 +1,9 @@
 
 import Head from 'next/head';
 import Image from 'next/image';
-import styles from '../../styles/Home.module.css';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import { Button } from "@chakra-ui/react"
+import { Input, Button } from "@chakra-ui/react"
 import {
   Mina,
   isReady,
@@ -14,6 +13,7 @@ import {
   PrivateKey,
 } from 'snarkyjs';
 import { ethers } from 'ethers'
+import styles  from './styles/style.module.css';
 import "../../pages/reactCOIServiceWorker";
 
 import ZkappWorkerClient from "../../pages/zkappWorkerClient";
@@ -21,6 +21,84 @@ import MintNFT from "../../abi/MintNFT.json";
 
 const transactionFee = 0.1;
 export const PostReview: FC = () => {
+  const router = useRouter();
+
+  const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
+
+  const [userAddress, setUserAddress] = useState('');
+  const [review, setReview] = useState('');
+  const [bookId, setBookId] = useState('');
+  const [bookTitle, setBookTitle] = useState('');
+  const [bookDescription, setBookDescription] = useState<string | null>(null);
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
+
+  useEffect(() => {
+    const connectWallet = async () => {
+      try {
+        const { ethereum } = window as any;
+        if (!ethereum) {
+          throw new Error('Please install MetaMask!');
+        } else {
+          console.log('MetaMask is installed!', ethereum);
+        }
+
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        setProvider(provider);
+
+        const accounts = await provider.listAccounts();
+        const currentAccount = accounts[0];
+        setUserAddress(currentAccount);
+
+        const connectedChainId = await provider.getNetwork().then((network) => network.chainId);
+        await ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: ethers.utils.hexValue(connectedChainId) }],
+        });
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    connectWallet()
+  }, [userAddress])
+
+  const [tokenId, setTokenId] = useState<string>();
+
+  useEffect(() => {
+    const getBook = async () : Promise<void> => {
+      try {
+        const { ethereum } = window as any;
+        if (!ethereum) {
+          throw new Error('Please install MetaMask!');
+        } else {
+          console.log('MetaMask is installed!', ethereum);
+        }
+
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, MintNFT.abi, signer);
+
+        const currentUrl = router.asPath;
+        const regex = /\/(\d+)$/;
+        const match = currentUrl.match(regex);
+        if (match) {
+          setTokenId(match[1]);
+        } else {
+          console.log('数字が見つかりませんでした');
+        }
+
+        const book = await contract.getBookById(tokenId);
+        setBookTitle(book?.title)
+        setBookDescription(book?.description)
+
+        const comments: string[] = await contract.getCommentsByBook(tokenId);
+        setBookDescription(comments.join(', '))
+      } catch (e) {
+        console.log('エラー', e)
+      }
+    }
+    getBook();
+  },[])
+
   let [state, setState] = useState({
     zkappWorkerClient: null as null | ZkappWorkerClient,
     hasWallet: null as null | boolean,
@@ -328,82 +406,6 @@ export const PostReview: FC = () => {
   }
 
   // ------------------------------
-  const router = useRouter();
-
-  const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
-
-  const [userAddress, setUserAddress] = useState('');
-  const [review, setReview] = useState('');
-  const [bookTitle, setBookTitle] = useState('');
-  const [bookDescription, setBookDescription] = useState<string | null>(null);
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
-
-  useEffect(() => {
-    const connectWallet = async () => {
-      try {
-        const { ethereum } = window as any;
-        if (!ethereum) {
-          throw new Error('Please install MetaMask!');
-        } else {
-          console.log('MetaMask is installed!', ethereum);
-        }
-
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        setProvider(provider);
-
-        const accounts = await provider.listAccounts();
-        const currentAccount = accounts[0];
-        setUserAddress(currentAccount);
-
-        const connectedChainId = await provider.getNetwork().then((network) => network.chainId);
-        await ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: ethers.utils.hexValue(connectedChainId) }],
-        });
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    connectWallet()
-  }, [userAddress])
-
-  const [tokenId, setTokenId] = useState<string>();
-
-  useEffect(() => {
-    const getBook = async () : Promise<void> => {
-      try {
-        const { ethereum } = window as any;
-        if (!ethereum) {
-          throw new Error('Please install MetaMask!');
-        } else {
-          console.log('MetaMask is installed!', ethereum);
-        }
-
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, MintNFT.abi, signer);
-
-        const currentUrl = router.asPath;
-        const regex = /\/(\d+)$/;
-        const match = currentUrl.match(regex);
-        if (match) {
-          setTokenId(match[1]);
-        } else {
-          console.log('数字が見つかりませんでした');
-        }
-
-        const book = await contract.getBookById(tokenId);
-        setBookTitle(book?.title)
-        setBookDescription(book?.description)
-
-        const comments: string[] = await contract.getCommentsByBook(tokenId);
-        setBookDescription(comments.join(', '))
-      } catch (e) {
-        console.log('エラー', e)
-      }
-    }
-    getBook();
-  },[])
 
   // post review -----------------------------------
   const postReview = async (review: string) : Promise<void> => {
@@ -433,11 +435,19 @@ export const PostReview: FC = () => {
 
 
   return (
-    <div>
-      <p>{bookTitle}</p>
-      <p>{bookDescription}</p>
-      <input type="text" width="20" value={bookDescription ?? review} onChange={handleReviewChange}/>
-      <Button onClick={() => postReview(review)}>post review</Button>
+    <div className={styles.container}>
+      <div className={styles.tokenInfo}>
+        <Image src={`${tokenId}.png`} width={200} height={200} alt="logo" className={styles.img} />
+        <div>
+          <p>title: {bookTitle}</p>
+          <p>description: {bookDescription}</p>
+        </div>
+      </div>
+      <div className={styles.form}>
+        <Input type="text" width="40" value={review} onChange={handleReviewChange}/>
+        <Button onClick={() => postReview(review)}>post review</Button>
+      </div>
+
       {setup}
       {accountDoesNotExist}
       {mainContent}
