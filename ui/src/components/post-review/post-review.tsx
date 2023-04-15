@@ -395,14 +395,14 @@ export const PostReview: FC = () => {
           Send Transaction{' '}
         </Button>
           </Stack>
-        <div> Current Number in zkApp: {state.x?.toString()} </div>
+        {/* <div> Current Number in zkApp: {state.x?.toString()} </div>
         <button onClick={onRefreshCurrentHash}> Get Latest State </button>
       
         <div> Current Verified CId in zkApp:</div>
         {state.verifiedCIds?.map((ele,i)=>(
           <div key={i}>{ele.toString()}</div>
         ))}
-        <button onClick={onRefreshCurrentVerifiedCIds}> Get Latest State </button>
+        <button onClick={onRefreshCurrentVerifiedCIds}> Get Latest State </button> */}
       </Container>
     );
   }
@@ -442,9 +442,15 @@ export const PostReview: FC = () => {
       <Heading as='h2' size='2xl' className={styles.h2}>Post your comment</Heading>
         <Stack direction='row'>
           <Image src={`/${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
-          <div>
-            <Text fontSize='xl'>title: {bookTitle}</Text>
-            <Text fontSize='md'>description: {bookDescription}</Text>
+          <div className={styles.alignItemsCenter}>
+            <div>
+
+            <Heading as='h3' size='lg'>title</Heading>
+            <Text fontSize='xl'>Bitcoin: A Peer-to-Peer Electronic Cash System
+</Text>
+            <Heading as='h3' size='lg'>description</Heading>
+            <Text fontSize='md'>Written by Satoshi Nakamoto</Text>
+            </div>
           </div>
       </Stack>
       <Stack>

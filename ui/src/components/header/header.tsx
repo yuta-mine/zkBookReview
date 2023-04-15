@@ -7,7 +7,7 @@ export const Header: FC = () => {
   return (
     <div className={styles.header}>
       <Link href="/">
-        <Image src="logo.png" width={200} height={200} alt="logo"/>
+        <Image src="/logo.png" width={200} height={200} alt="logo"/>
       </Link>
     </div>
   )
