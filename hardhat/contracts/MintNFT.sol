@@ -28,6 +28,7 @@ contract MintNFT is ERC721Enumerable {
          address reviewer;
      }
 
+     mapping(uint256 => uint256) private _tokenPrices;
      mapping(uint256 => string[]) private _verifiedBlockAddressList; // bookid =>
      mapping(uint256 => Book) public books;
      mapping(uint256 => Comment) public comments;
@@ -45,17 +46,28 @@ contract MintNFT is ERC721Enumerable {
      function addBook(string memory _title, string memory _description, string memory _imageId) public onlyOwner returns (uint256){
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
+        _tokenPrices[tokenId] = 0;
         _safeMint(msg.sender, newTokenId);
         Book memory book = Book(newTokenId, _title, _description, _imageId);
         books[newTokenId] = book;
         allBooks.push(book);
+        nextBookId++;
         return newTokenId;
      }
 
-    function purchase(uint256 _tokenId) public {
+    function purchase(uint256 _tokenId) public payable  {
+        uint256 price = _tokenPrices[tokenId];
         require(owner != address(0), "NFT is not minted yet");
         require(msg.sender != owner, "You can't purchase your own NFT");
-        transferFrom(owner, msg.sender, tokenId);
+        require(msg.value >= price, "Insufficient funds to purchase the NFT");
+      
+        address payable payableOwner = payable(owner);
+        payableOwner.transfer(price);
+        if (msg.value > price) {
+            address payable buyer = payable(msg.sender);
+            buyer.transfer(msg.value - price);
+        }
+        _transfer(owner, msg.sender, _tokenId);
         owner = msg.sender;
     }
 
@@ -76,8 +88,9 @@ contract MintNFT is ERC721Enumerable {
      function addComment(uint256 _bookId, string memory _content, address _reviewer) public {
          require(_bookId > 0 && _bookId < nextBookId, "Invalid Book ID.");
 
-         uint256 commentId = nextCommentId++;
+         uint256 commentId = nextCommentId;
          comments[commentId] = Comment(commentId, _bookId, _content, _reviewer);
+         nextCommentId++;
      }
 
      function isMintNFTed(uint256 _bookId) public view returns (bool) {
@@ -129,4 +142,13 @@ contract MintNFT is ERC721Enumerable {
     function getAllBooks() public view returns (Book[] memory) {
         return allBooks;
     }
+
+    function getBookById(uint256 bookID) public view returns (Book memory) {
+        require(bookID < allBooks.length, "bookID is out of range");
+        return allBooks[bookID];
+    }
+
+    function getVerifiedBlockAddresses(uint256 key) public view returns (string[] memory) { 
+        return _verifiedBlockAddressList[key]; 
+    } 
  }
