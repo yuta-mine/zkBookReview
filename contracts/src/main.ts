@@ -22,9 +22,6 @@ const { privateKey: deployerKey, publicKey: deployerAccount } =
 const { privateKey: senderKey, publicKey: senderAccount } =
   Local.testAccounts[1];
 
-// If you want to cause error, please use senderKey2 as setSecret() parameter
-// const { privateKey: senderKey2, publicKey: senderAccount2 } = Local.testAccounts[2];
-
 const zkAppPrivateKey = PrivateKey.random();
 const zkAppAddress = zkAppPrivateKey.toPublicKey();
 
@@ -35,18 +32,6 @@ const deployTxn = await Mina.transaction(deployerAccount, () => {
 });
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
 
-try {
-  const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.setAdminAccount(senderKey);
-  });
-  await tx1.prove();
-  await tx1.sign([senderKey]).send();
-  const adminAccount = zkAppInstance.adminAccount.get();
-  console.log('adminAccount is:', adminAccount.toBase58());
-} catch (e) {
-  console.log(e);
-}
-
 const secret1 = Encoding.stringToFields('secret')[0];
 
 try {
@@ -56,8 +41,7 @@ try {
       Field(secret1),
       Field(secret1),
       Field(secret1),
-      Field(secret1),
-      senderKey // if you want to cause error, please use signerKey2 as setSecret() parameter
+      Field(secret1)
     );
   });
   await tx1.prove();
@@ -178,6 +162,44 @@ try {
   await tx1.sign([senderKey]).send();
   const cId5 = zkAppInstance.verifiedCId5.get();
   console.log('the commentId on verifiedCId5:', cId5.toString());
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading6(
+      Field(6),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId6 = zkAppInstance.verifiedCId6.get();
+  console.log('the commentId on verifiedCId6:', cId6.toString());
+} catch (e) {
+  console.log(e);
+}
+
+try {
+  const tx1 = await Mina.transaction(senderAccount, () => {
+    zkAppInstance.proveReading7(
+      Field(7),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1),
+      Field(secret1)
+    );
+  });
+  await tx1.prove();
+  await tx1.sign([senderKey]).send();
+  const cId7 = zkAppInstance.verifiedCId7.get();
+  console.log('the commentId on verifiedCId7:', cId7.toString());
 } catch (e) {
   console.log(e);
 }

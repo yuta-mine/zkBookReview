@@ -1,4 +1,4 @@
-import { Mina, isReady, PublicKey, PrivateKey,fetchAccount } from 'snarkyjs';
+import { Mina, isReady, PublicKey, PrivateKey,fetchAccount, Field } from 'snarkyjs';
 type Transaction = Awaited<ReturnType<typeof Mina.transaction>>;
 
 // ---------------------------------------------------------------------------------------
@@ -18,8 +18,8 @@ interface Functions {
   compileContract: any,
   fetchAccount: any,
   initZkappInstance: any,
-  getAdminAcount: any,
-  createUpdateTransaction: any,
+  getX: any,
+  createSetSecretTransaction: any,
   proveUpdateTransaction: any,
   getTransactionJSON: any,
 }
@@ -51,13 +51,13 @@ const functions: Functions = {
     const publicKey = PublicKey.fromBase58(args.publicKey58);
     state.zkapp = new state.BookReview!(publicKey);
   },
-  getAdminAcount: async (args: {}) => {
-    const currentPubKey = state.zkapp!.adminAccount.get();
-    return currentPubKey;
+  getX: async (args: {}) => {
+    const x = state.zkapp!.x.get();
+    return JSON.stringify(x.toJSON());
   },
-  createUpdateTransaction: async (args: {privateKey: string}) => {
+  createSetSecretTransaction: async (args: {secret1: Field,secret2: Field,secret3: Field,secret4: Field,secret5: Field,}) => {
     const transaction = await Mina.transaction(() => {
-      state.zkapp!.setAdminAccount(PrivateKey.fromBase58(args.privateKey));
+      state.zkapp!.setSecret(args.secret1,args.secret2,args.secret3,args.secret4,args.secret5,);
     });
     state.transaction = transaction;
   },
