@@ -1,0 +1,18 @@
+.list {
+  display: flex;
+  justify-content: center;
+}
+
+.element {
+  margin: 1rem;
+}
+
+.text {
+  padding: 0.2rem;
+}
+
+.img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
