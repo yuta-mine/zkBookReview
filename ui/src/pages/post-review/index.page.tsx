@@ -34,6 +34,7 @@ export default function PostReview() {
   const [secret3, setSecret3] = useState<string>();
   const [secret4, setSecret4] = useState<string>();
   const [secret5, setSecret5] = useState<string>();
+  const [cId, setCId] = useState<number>();
 
   console.log(secret1, typeof secret1);
   console.log(secret2, typeof secret2);
@@ -136,7 +137,7 @@ export default function PostReview() {
 
   // -------------------------------------------------------
   // Send a transaction
-  const onSendTransaction = async () => {
+  const onSendSetSecretTransaction = async () => {
     setState({ ...state, creatingTransaction: true });
     console.log('sending a transaction...');
     await state.zkappWorkerClient!.fetchAccount({
@@ -162,6 +163,34 @@ export default function PostReview() {
     setState({ ...state, creatingTransaction: false });
   }
 
+    // Send a transaction
+    const onSendProveReadingTransaction = async () => {
+      setState({ ...state, creatingTransaction: true });
+      console.log('sending a transaction...');
+      await state.zkappWorkerClient!.fetchAccount({
+        publicKey: state.publicKey!
+      });
+      if(!secret1 || !secret2 || !secret3 || !secret4 || !secret5 || !cId)return;
+      await state.zkappWorkerClient!.createProveReadingTransaction({cId, secret1,secret2,secret3,secret4,secret5});
+      console.log('creating proof...');
+      await state.zkappWorkerClient!.proveUpdateTransaction();
+      console.log('getting Transaction JSON...');
+      const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
+      console.log('requesting send transaction...');
+      const { hash } = await (window as any).mina.sendTransaction({
+        transaction: transactionJSON,
+        feePayer: {
+          fee: transactionFee,
+          memo: '',
+        },
+      });
+      console.log(
+        'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
+      );
+      setState({ ...state, creatingTransaction: false });
+    }
+
+
   const handleChange1 = (e: { target: { value: string | undefined; }; }) => {
     setSecret1(() => e.target.value)
   }
@@ -176,6 +205,9 @@ export default function PostReview() {
   }
   const handleChange5 = (e: { target: { value: string | undefined; }; }) => {
     setSecret5(() => e.target.value)
+  }
+  const handleChangeCId = (e: { target: { value: string | undefined; }; }) => {
+    setCId(() => Number(e.target.value))
   }
   // -------------------------------------------------------
 
@@ -242,14 +274,14 @@ export default function PostReview() {
   if (state.hasBeenSetup && state.accountExists) {
     mainContent = (
       <div>
-        <h3>set admin account</h3>
+        <h3>set secret</h3>
         <input value={secret1} onChange={handleChange1} type="text"/>
         <input value={secret2} onChange={handleChange2} type="text"/>
         <input value={secret3} onChange={handleChange3} type="text"/>
         <input value={secret4} onChange={handleChange4} type="text"/>
         <input value={secret5} onChange={handleChange5} type="text"/>
         <button
-          onClick={onSendTransaction}
+          onClick={onSendSetSecretTransaction}
           disabled={state.creatingTransaction}
         >
           {' '}
@@ -257,8 +289,15 @@ export default function PostReview() {
         </button>
         <div> Current Number in zkApp: {state.x?.toString()} </div>
         <button onClick={onRefreshCurrentNum}> Get Latest State </button>
-        <h3>set secret</h3>
-
+        <h3>prove reading</h3>
+        <input value={cId} onChange={handleChangeCId} type="text"/>
+        <button
+          onClick={onSendProveReadingTransaction}
+          disabled={state.creatingTransaction}
+        >
+          {' '}
+          Send Transaction{' '}
+        </button>
       </div>
     );
   }
