@@ -335,7 +335,7 @@ export const PostReview: FC = () => {
   const [userAddress, setUserAddress] = useState('');
   const [review, setReview] = useState('');
   const [bookTitle, setBookTitle] = useState('');
-  const [bookDescription, setBookDescription] = useState('');
+  const [bookDescription, setBookDescription] = useState<string | null>(null);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
 
   useEffect(() => {
@@ -395,6 +395,9 @@ export const PostReview: FC = () => {
         const book = await contract.getBookById(tokenId);
         setBookTitle(book?.title)
         setBookDescription(book?.description)
+
+        const comments: string[] = await contract.getCommentsByBook(tokenId);
+        setBookDescription(comments.join(', '))
       } catch (e) {
         console.log('エラー', e)
       }
@@ -433,7 +436,7 @@ export const PostReview: FC = () => {
     <div>
       <p>{bookTitle}</p>
       <p>{bookDescription}</p>
-      <input type="text" value={review} onChange={handleReviewChange}/>
+      <input type="text" width="20" value={bookDescription ?? review} onChange={handleReviewChange}/>
       <Button onClick={() => postReview(review)}>post review</Button>
       {setup}
       {accountDoesNotExist}
