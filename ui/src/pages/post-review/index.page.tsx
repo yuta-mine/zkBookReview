@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../../styles/Home.module.css';
 import { useEffect, useState } from 'react';
-import type { Add } from '../../../contracts/src/';
+import type { BookReview } from '../../../../contracts/src/';
 import {
   Mina,
   isReady,
@@ -15,12 +15,9 @@ export default function PostReview() {
   useEffect(() => {
     (async () => {
       await isReady;
-      const { Add } = await import('../../../contracts/build/src/');
+      const { BookReview } = await import('../../../../contracts/build/src/');
 
-      // Update this to use the address (public key) for your zkApp account
-      // To try it out, you can try this address for an example "Add" smart contract that we've deployed to 
-      // Berkeley Testnet B62qisn669bZqsh8yMWkNyCA7RvjrL6gfdr3TQxymDHNhTc97xE5kNV
-      const zkAppAddress = '';
+      const zkAppAddress = 'B62qjiXpQjApqs9tKwnwthZExPgMKJKKGpYYfLkep7Rs5aYScZLrKhC';
       // This should be removed once the zkAppAddress is updated.
       if (!zkAppAddress) {
         console.error(
@@ -28,9 +25,11 @@ export default function PostReview() {
         );
       }
 
-      const zkApp = new Add(PublicKey.fromBase58(zkAppAddress));
+      const zkApp = new BookReview(PublicKey.fromBase58(zkAppAddress));
 
     })();
+
+    
   }, []);
 
   return (
