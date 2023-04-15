@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import { Input, Button } from "@chakra-ui/react"
+import { Grid, GridItem, Stack, Input, Button,Text } from "@chakra-ui/react"
 import {
   Mina,
   isReady,
@@ -27,7 +27,6 @@ export const PostReview: FC = () => {
 
   const [userAddress, setUserAddress] = useState('');
   const [review, setReview] = useState('');
-  const [bookId, setBookId] = useState('');
   const [bookTitle, setBookTitle] = useState('');
   const [bookDescription, setBookDescription] = useState<string | null>(null);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
@@ -435,22 +434,29 @@ export const PostReview: FC = () => {
 
 
   return (
-    <div className={styles.container}>
-      <div className={styles.tokenInfo}>
-        <Image src={`${tokenId}.png`} width={200} height={200} alt="logo" className={styles.img} />
-        <div>
-          <p>title: {bookTitle}</p>
-          <p>description: {bookDescription}</p>
-        </div>
-      </div>
-      <div className={styles.form}>
-        <Input type="text" width="40" value={review} onChange={handleReviewChange}/>
-        <Button onClick={() => postReview(review)}>post review</Button>
-      </div>
-
-      {setup}
-      {accountDoesNotExist}
-      {mainContent}
+    <div>
+      <Stack align='center'>
+      <Stack align='center'>
+        <Stack direction='row'>
+          <Image src={`${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
+          <div>
+            <Text fontSize='xl'>title: {bookTitle}</Text>
+            <Text fontSize='md'>description: {bookDescription}</Text>
+          </div>
+        </Stack>
+      </Stack>
+      <Stack direction="column" spacing={2}>
+        <Stack align='center'>
+          <Input type="text" value={review} onChange={handleReviewChange} width='25rem' height='5rem'/>
+        </Stack>
+        <Stack align='end'>
+          <Button onClick={() => postReview(review)} colorScheme='blue'>post review</Button>
+        </Stack>
+      </Stack>
+    </Stack>
+        {setup}
+        {accountDoesNotExist}
+        {mainContent}
     </div>
   );
 }
