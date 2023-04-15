@@ -17,6 +17,8 @@ contract MintNFT is ERC721Enumerable {
      struct Book {
          uint256 id;
          string title;
+         string description;
+         string imageId;
      }
 
      struct Comment {
@@ -29,6 +31,7 @@ contract MintNFT is ERC721Enumerable {
      mapping(uint256 => string[]) private _verifiedBlockAddressList; // bookid =>
      mapping(uint256 => Book) public books;
      mapping(uint256 => Comment) public comments;
+     Book[] public allBooks;
 
      address public owner;
      uint256 private nextBookId = 1;
@@ -39,11 +42,13 @@ contract MintNFT is ERC721Enumerable {
          _;
      }
 
-     function addBook(string memory _title) public onlyOwner returns (uint256){
+     function addBook(string memory _title, string memory _description, string memory _imageId) public onlyOwner returns (uint256){
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
         _safeMint(msg.sender, newTokenId);
-        books[newTokenId] = Book(newTokenId, _title);
+        Book memory book = Book(newTokenId, _title, _description, _imageId);
+        books[newTokenId] = book;
+        allBooks.push(book);
         return newTokenId;
      }
 
@@ -55,14 +60,14 @@ contract MintNFT is ERC721Enumerable {
     }
 
 
-    // function tokensOfOwner() external view returns (uint[] memory) {
-    //     uint tokenCount = balanceOf(owner);
-    //     uint[] memory tokensId = new uint256[](tokenCount);
-    //     for (uint i = 0; i < tokenCount; i++) {
-    //         tokensId[i] = tokenOfOwnerByIndex(owner, i);
-    //     }
-    //     return tokensId;
-    // }
+    function tokensOfOwner() external view returns (uint[] memory) {
+        uint tokenCount = balanceOf(owner);
+        uint[] memory tokensId = new uint256[](tokenCount);
+        for (uint i = 0; i < tokenCount; i++) {
+            tokensId[i] = tokenOfOwnerByIndex(owner, i);
+        }
+        return tokensId;
+    }
 
     function addVerifiedBlockAddress(uint256 _bookId, string memory _blockAddress) public onlyOwner {
          _verifiedBlockAddressList[_bookId].push(_blockAddress);
@@ -119,5 +124,9 @@ contract MintNFT is ERC721Enumerable {
             }
         }
         return result;
+    }
+
+    function getAllBooks() public view returns (Book[] memory) {
+        return allBooks;
     }
  }
