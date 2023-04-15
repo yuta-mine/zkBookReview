@@ -134,7 +134,7 @@ export const NFTList: FC = () => {
   return <div className={styles.list}>
       {nfts?.map((nft, i) => (
         <div key={i} className={styles.element}>
-          <Image src={`${nft.id}.png`} width={200} height={200} alt="logo"/>
+          <Image src={`${nft.id}.png`} width={200} height={200} alt="logo" className={styles.img}/>
           <p className={styles.text}>title: {nft.title}</p>
           <p className={styles.text}>description: {nft.description}</p>
           <p className={styles.text}>image: {nft.imageId}</p>
@@ -142,7 +142,6 @@ export const NFTList: FC = () => {
           <p className={styles.text}>comment: {[...comments]}</p>
           <Button onClick={() => buyNFT(nft.id)}>buy</Button>
           <Link href={`/post-review/${nft.id}`}>
-            {/* <div className={styles.reviewLink}>post review</div> */}
             <Button>post review</Button> 
           </Link>
         </div>
