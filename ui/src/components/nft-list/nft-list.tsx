@@ -20,20 +20,22 @@ import {
 import styles from "./styles/style.module.css";
 import MintNFT from "../../abi/MintNFT.json";
 
+interface NFT {
+  id: string;
+  title: string;
+  description: string;
+  imageId: string;
+}
+interface Comment {
+  id: string;
+  bookId: string;
+  content: string;
+}
+
 export const NFTList: FC = () => {
   const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
 
-  interface NFT {
-    id: string;
-    title: string;
-    description: string;
-    imageId: string;
-  }
-  interface Comment {
-    id: string;
-    bookId: string;
-    content: string;
-  }
+
 
   const [nfts, setNFTs] = useState<NFT[]>([]);
   const [comments, setComments] = useState<string[][]>([]);
@@ -100,7 +102,7 @@ export const NFTList: FC = () => {
   };
   useEffect(() => {
     loadNfts();
-  }, []);
+  }, [loadNfts]);
   // -----------------------------------
 
   // buy -----------------------------------
