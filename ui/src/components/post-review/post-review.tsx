@@ -442,9 +442,15 @@ export const PostReview: FC = () => {
       <Heading as='h2' size='2xl' className={styles.h2}>Post your comment</Heading>
         <Stack direction='row'>
           <Image src={`/${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
-          <div>
-            <Text fontSize='xl'>title: {bookTitle}</Text>
-            <Text fontSize='md'>description: {bookDescription}</Text>
+          <div className={styles.alignItemsCenter}>
+            <div>
+
+            <Heading as='h3' size='lg'>title</Heading>
+            <Text fontSize='xl'>Bitcoin: A Peer-to-Peer Electronic Cash System
+</Text>
+            <Heading as='h3' size='lg'>description</Heading>
+            <Text fontSize='md'>Written by Satoshi Nakamoto</Text>
+            </div>
           </div>
       </Stack>
       <Stack>
