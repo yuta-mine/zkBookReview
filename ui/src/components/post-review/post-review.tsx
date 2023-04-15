@@ -374,21 +374,25 @@ export const PostReview: FC = () => {
       <Container maxW='2xl'>
         {/* <Heading as='h2' size='2xl'>set secret</Heading> */}
         <Heading as='h2' size='2xl'>ZKP</Heading>
+        <Stack spacing={4} className={styles.formStack}>
+
         <Text>Q1. What is the fourth step to run the network ?</Text>
         <Input value={secret1} onChange={handleChange1} type="text"/>
         <Text>Q2. What is the fourth step to run the network ?</Text>
         <Input value={secret2} onChange={handleChange2} type="text"/>
         <Text>Q3. Please copy and paste the text under the heading 6. Incentive</Text>
-        <Input value={secret3} onChange={handleChange3} type="text" width='25rem' height='5rem'/>
+        <Input value={secret3} onChange={handleChange3} type="text" height='5rem'/>
         <Input value={secret4} onChange={handleChange4} type="text"/>
         <Input value={secret5} onChange={handleChange5} type="text"/>
         <Text>Please input your commentId</Text>
         <Input value={cId} onChange={handleChangeCId} type="text"/>
-        <Stack align='end'>
+          </Stack>
+        <Stack align='end' className={styles.minaTransactionStack}>
 
         <Button 
         onClick={onSendSetSecretTransaction}
-        disabled={state.creatingTransaction}     
+        disabled={state.creatingTransaction}
+        colorScheme='green'   
         >
                     {' '}
           Send Transaction{' '}
@@ -399,6 +403,7 @@ export const PostReview: FC = () => {
         <Button
           onClick={onSendProveReadingTransaction}
           disabled={state.creatingTransaction}
+          colorScheme='green'
           >
           {' '}
           Send Transaction{' '}
@@ -463,7 +468,7 @@ export const PostReview: FC = () => {
           <Input type="text" value={review} onChange={handleReviewChange} width='25rem' height='5rem'/>
         </Stack>
         <Stack align='end'>
-          <Button onClick={() => postReview(review)} colorScheme='blue'>post review</Button>
+          <Button onClick={() => postReview(review)} colorScheme='green'>post review</Button>
         </Stack>
       </Stack>
     </Stack>
