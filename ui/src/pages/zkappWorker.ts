@@ -26,6 +26,13 @@ interface Functions {
   fetchAccount: any;
   initZkappInstance: any;
   getX: any;
+  getVerifiedCId1: any;
+  getVerifiedCId2: any;
+  getVerifiedCId3: any;
+  getVerifiedCId4: any;
+  getVerifiedCId5: any;
+  getVerifiedCId6: any;
+  getVerifiedCId7: any;
   createSetSecretTransaction: any;
   createProveReadingTransaction: any;
   proveUpdateTransaction: any;
@@ -64,6 +71,34 @@ const functions: Functions = {
   getX: async (args: {}) => {
     const x = state.zkapp!.x.get();
     return JSON.stringify(x.toJSON());
+  },
+  getVerifiedCId1: async (args: {}) => {
+    const verifiedCId1 = state.zkapp!.verifiedCId1.get();
+    return JSON.stringify(verifiedCId1.toJSON());
+  },
+  getVerifiedCId2: async (args: {}) => {
+    const verifiedCId2 = state.zkapp!.verifiedCId2.get();
+    return JSON.stringify(verifiedCId2.toJSON());
+  },
+  getVerifiedCId3: async (args: {}) => {
+    const verifiedCId3 = state.zkapp!.verifiedCId3.get();
+    return JSON.stringify(verifiedCId3.toJSON());
+  },
+  getVerifiedCId4: async (args: {}) => {
+    const verifiedCId4 = state.zkapp!.verifiedCId4.get();
+    return JSON.stringify(verifiedCId4.toJSON());
+  },
+  getVerifiedCId5: async (args: {}) => {
+    const verifiedCId5 = state.zkapp!.verifiedCId5.get();
+    return JSON.stringify(verifiedCId5.toJSON());
+  },
+  getVerifiedCId6: async (args: {}) => {
+    const verifiedCId6 = state.zkapp!.verifiedCId6.get();
+    return JSON.stringify(verifiedCId6.toJSON());
+  },
+  getVerifiedCId7: async (args: {}) => {
+    const verifiedCId7 = state.zkapp!.verifiedCId7.get();
+    return JSON.stringify(verifiedCId7.toJSON());
   },
   createSetSecretTransaction: async (args: {
     secret1: Field;
