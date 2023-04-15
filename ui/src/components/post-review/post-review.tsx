@@ -452,31 +452,29 @@ export const PostReview: FC = () => {
 
 
   return (
-    <div>
-      <Stack align='center'>
-      <Stack align='center'>
+    <Container maxW='2xl'>
+      <Heading as='h2' size='2xl' className={styles.h2}>Post your comment</Heading>
         <Stack direction='row'>
           <Image src={`/${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
           <div>
             <Text fontSize='xl'>title: {bookTitle}</Text>
             <Text fontSize='md'>description: {bookDescription}</Text>
           </div>
-        </Stack>
       </Stack>
-      <Stack direction="column" spacing={2}>
+      <Stack direction="column" spacing={2} className={styles.formStack}>
+        <Text>Comment !</Text>
         <Stack align='center'>
-          <Input type="text" value={review} onChange={handleReviewChange} width='25rem' height='5rem'/>
+          <Input type="text" value={review} onChange={handleReviewChange} height='5rem'/>
         </Stack>
         <Stack align='end'>
           <Button onClick={() => postReview(review)} colorScheme='green'>post review</Button>
         </Stack>
       </Stack>
-    </Stack>
     <Text>{postedCId && `CommentId you just now submitted : ${postedCId}`}</Text>
         {setup}
         {accountDoesNotExist}
         {mainContent}
-    </div>
+    </Container>
   );
 }
 
