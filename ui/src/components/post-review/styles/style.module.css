@@ -21,3 +21,16 @@
   height: 200px;
   object-fit: contain;
 }
+
+.formStack {
+  margin-top: 20px;
+}
+
+.minaTransactionStack {
+  margin-top: 20px;
+}
+
+.h2 {
+  margin-top:12px;
+  margin-bottom: 12px;
+}

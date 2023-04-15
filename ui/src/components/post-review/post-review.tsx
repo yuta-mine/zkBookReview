@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import { Grid, GridItem, Stack, Input, Button,Text } from "@chakra-ui/react"
+import { Grid, GridItem, Stack, Input, Button,Text,Heading, Container  } from "@chakra-ui/react"
 import {
   Mina,
   isReady,
@@ -30,6 +30,7 @@ export const PostReview: FC = () => {
   const [bookTitle, setBookTitle] = useState('');
   const [bookDescription, setBookDescription] = useState<string | null>(null);
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
+  const [postedCId, setPostedCId] = useState<number>();
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -343,7 +344,7 @@ export const PostReview: FC = () => {
   }
 
   let setupText = state.hasBeenSetup
-    ? 'SnarkyJS Ready'
+    ? ''
     : 'Setting up SnarkyJS...';
   let setup = (
     <div>
@@ -370,37 +371,53 @@ export const PostReview: FC = () => {
   let mainContent;
   if (state.hasBeenSetup && state.accountExists) {
     mainContent = (
-      <div>
-        <h3>set secret</h3>
-        <input value={secret1} onChange={handleChange1} type="text"/>
-        <input value={secret2} onChange={handleChange2} type="text"/>
-        <input value={secret3} onChange={handleChange3} type="text"/>
-        <input value={secret4} onChange={handleChange4} type="text"/>
-        <input value={secret5} onChange={handleChange5} type="text"/>
-        <button
-          onClick={onSendSetSecretTransaction}
-          disabled={state.creatingTransaction}
+      <Container maxW='2xl'>
+        {/* <Heading as='h2' size='2xl'>set secret</Heading> */}
+        <Heading as='h2' size='2xl'>ZKP</Heading>
+        <Stack spacing={4} className={styles.formStack}>
+
+        <Text>Q1. What is the fourth step to run the network ?</Text>
+        <Input value={secret1} onChange={handleChange1} type="text"/>
+        <Text>Q2. What is the fourth step to run the network ?</Text>
+        <Input value={secret2} onChange={handleChange2} type="text"/>
+        <Text>Q3. Please copy and paste the text under the heading 6. Incentive</Text>
+        <Input value={secret3} onChange={handleChange3} type="text" height='5rem'/>
+        <Input value={secret4} onChange={handleChange4} type="text"/>
+        <Input value={secret5} onChange={handleChange5} type="text"/>
+        <Text>Please input your commentId</Text>
+        <Input value={cId} onChange={handleChangeCId} type="text"/>
+          </Stack>
+        <Stack align='end' className={styles.minaTransactionStack}>
+
+        <Button 
+        onClick={onSendSetSecretTransaction}
+        disabled={state.creatingTransaction}
+        colorScheme='green'   
         >
-          {' '}
+                    {' '}
           Send Transaction{' '}
-        </button>
-        <div> Current Number in zkApp: {state.x?.toString()} </div>
-        <button onClick={onRefreshCurrentHash}> Get Latest State </button>
-        <h3>prove reading</h3>
-        <input value={cId} onChange={handleChangeCId} type="text"/>
-        <button
+        </Button>
+        </Stack>
+        <Stack align='end'>
+
+        <Button
           onClick={onSendProveReadingTransaction}
           disabled={state.creatingTransaction}
-        >
+          colorScheme='green'
+          >
           {' '}
           Send Transaction{' '}
-        </button>
+        </Button>
+          </Stack>
+        <div> Current Number in zkApp: {state.x?.toString()} </div>
+        <button onClick={onRefreshCurrentHash}> Get Latest State </button>
+      
         <div> Current Verified CId in zkApp:</div>
         {state.verifiedCIds?.map((ele,i)=>(
           <div key={i}>{ele.toString()}</div>
         ))}
         <button onClick={onRefreshCurrentVerifiedCIds}> Get Latest State </button>
-      </div>
+      </Container>
     );
   }
 
@@ -421,6 +438,7 @@ export const PostReview: FC = () => {
       const contract = new ethers.Contract(contractAddress, MintNFT.abi, signer);
 
       const res = await contract.addComment(tokenId, review, userAddress);
+      setPostedCId(()=>res.commentId);
       console.log("res: ", res)
     } catch (e) {
       console.log('エラー', e)
@@ -434,30 +452,29 @@ export const PostReview: FC = () => {
 
 
   return (
-    <div>
-      <Stack align='center'>
-      <Stack align='center'>
+    <Container maxW='2xl'>
+      <Heading as='h2' size='2xl' className={styles.h2}>Post your comment</Heading>
         <Stack direction='row'>
-          <Image src={`${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
+          <Image src={`/${tokenId}.png`} width={150} height={200} alt="logo" className={styles.img} />
           <div>
             <Text fontSize='xl'>title: {bookTitle}</Text>
             <Text fontSize='md'>description: {bookDescription}</Text>
           </div>
-        </Stack>
       </Stack>
-      <Stack direction="column" spacing={2}>
+      <Stack direction="column" spacing={2} className={styles.formStack}>
+        <Text>Comment !</Text>
         <Stack align='center'>
-          <Input type="text" value={review} onChange={handleReviewChange} width='25rem' height='5rem'/>
+          <Input type="text" value={review} onChange={handleReviewChange} height='5rem'/>
         </Stack>
         <Stack align='end'>
-          <Button onClick={() => postReview(review)} colorScheme='blue'>post review</Button>
+          <Button onClick={() => postReview(review)} colorScheme='green'>post review</Button>
         </Stack>
       </Stack>
-    </Stack>
+    <Text>{postedCId && `CommentId you just now submitted : ${postedCId}`}</Text>
         {setup}
         {accountDoesNotExist}
         {mainContent}
-    </div>
+    </Container>
   );
 }
 
