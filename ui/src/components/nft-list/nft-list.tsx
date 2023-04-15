@@ -192,7 +192,7 @@ function MyCards({ nft, buy }: Props) {
       <Divider />
       <CardFooter>
         <ButtonGroup spacing="2">
-          <Button variant="solid" colorScheme="blue" onClick={buy}>
+          <Button variant="solid" colorScheme="green" onClick={buy}>
             Buy now
           </Button>
           <Link href={`/post-review/${nft.id}`}>
