@@ -1,15 +1,19 @@
+// "SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MintNFT is ERC721 {
+contract MintNFT is ERC721Enumerable {
+    uint256 public tokenId;
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+
     constructor() ERC721("MintNFT", "MintNFT") {
          owner = msg.sender;
     }
 
-    function mint(address to, uint256 tokenId) public {
-        _mint(to, tokenId);
-    }
      struct Book {
          uint256 id;
          string title;
@@ -35,10 +39,30 @@ contract MintNFT is ERC721 {
          _;
      }
 
-     function addBook(string memory _title) public onlyOwner {
-         uint256 bookId = nextBookId++;
-         books[bookId] = Book(bookId, _title);
+     function addBook(string memory _title) public onlyOwner returns (uint256){
+        _tokenIdCounter.increment();
+        uint256 newTokenId = _tokenIdCounter.current();
+        _safeMint(msg.sender, newTokenId);
+        books[newTokenId] = Book(newTokenId, _title);
+        return newTokenId;
      }
+
+    function purchase(uint256 _tokenId) public {
+        require(owner != address(0), "NFT is not minted yet");
+        require(msg.sender != owner, "You can't purchase your own NFT");
+        transferFrom(owner, msg.sender, tokenId);
+        owner = msg.sender;
+    }
+
+
+    // function tokensOfOwner() external view returns (uint[] memory) {
+    //     uint tokenCount = balanceOf(owner);
+    //     uint[] memory tokensId = new uint256[](tokenCount);
+    //     for (uint i = 0; i < tokenCount; i++) {
+    //         tokensId[i] = tokenOfOwnerByIndex(owner, i);
+    //     }
+    //     return tokensId;
+    // }
 
     function addVerifiedBlockAddress(uint256 _bookId, string memory _blockAddress) public onlyOwner {
          _verifiedBlockAddressList[_bookId].push(_blockAddress);
