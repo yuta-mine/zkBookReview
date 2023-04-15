@@ -47,6 +47,41 @@ export default class ZkappWorkerClient {
     return Field.fromJSON(JSON.parse(result as string));
   }
 
+  async getVerifiedCId1(): Promise<Field> {
+    const result = await this._call("getVerifiedCId1", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId2(): Promise<Field> {
+    const result = await this._call("getVerifiedCId2", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId3(): Promise<Field> {
+    const result = await this._call("getVerifiedCId3", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId4(): Promise<Field> {
+    const result = await this._call("getVerifiedCId4", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId5(): Promise<Field> {
+    const result = await this._call("getVerifiedCId5", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId6(): Promise<Field> {
+    const result = await this._call("getVerifiedCId6", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
+  async getVerifiedCId7(): Promise<Field> {
+    const result = await this._call("getVerifiedCId7", {});
+    return Field.fromJSON(JSON.parse(result as string));
+  }
+
   createSetSecretTransaction({
     secret1,
     secret2,

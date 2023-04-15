@@ -24,6 +24,7 @@ export default function PostReview() {
     hasBeenSetup: false,
     accountExists: false,
     x: null as null | Field,
+    verifiedCIds: null as null | number[],
     publicKey: null as null | PublicKey,
     zkappPublicKey: null as null | PublicKey,
     creatingTransaction: false,
@@ -213,7 +214,7 @@ export default function PostReview() {
 
   // -------------------------------------------------------
   // Refresh the current state
-  const onRefreshCurrentNum = async () => {
+  const onRefreshCurrentHash = async () => {
     console.log('getting zkApp state...');
     await state.zkappWorkerClient!.fetchAccount({
          publicKey: state.zkappPublicKey!
@@ -221,6 +222,22 @@ export default function PostReview() {
     const x = await state.zkappWorkerClient!.getX();
     console.log('current state:', x);
     setState({ ...state, x });
+  }
+
+  const onRefreshCurrentVerifiedCIds = async () => {
+    console.log('getting zkApp state...');
+    const verifiedCId1 = await state.zkappWorkerClient!.getVerifiedCId1();
+    const verifiedCId2 = await state.zkappWorkerClient!.getVerifiedCId2();
+    const verifiedCId3 = await state.zkappWorkerClient!.getVerifiedCId3();
+    const verifiedCId4 = await state.zkappWorkerClient!.getVerifiedCId4();
+    const verifiedCId5 = await state.zkappWorkerClient!.getVerifiedCId5();
+    const verifiedCId6 = await state.zkappWorkerClient!.getVerifiedCId6();
+    const verifiedCId7 = await state.zkappWorkerClient!.getVerifiedCId7();
+    const verifiedCIds = [Number(verifiedCId1.toString()), Number(verifiedCId2.toString()), Number(verifiedCId3.toString()), Number(verifiedCId4.toString()), Number(verifiedCId5.toString()), Number(verifiedCId6.toString()), Number(verifiedCId7.toString())].filter(ele=>ele !== 0);
+    
+    console.log(verifiedCIds);
+    
+    setState({ ...state, verifiedCIds });
   }
   // -------------------------------------------------------...
 
@@ -288,7 +305,7 @@ export default function PostReview() {
           Send Transaction{' '}
         </button>
         <div> Current Number in zkApp: {state.x?.toString()} </div>
-        <button onClick={onRefreshCurrentNum}> Get Latest State </button>
+        <button onClick={onRefreshCurrentHash}> Get Latest State </button>
         <h3>prove reading</h3>
         <input value={cId} onChange={handleChangeCId} type="text"/>
         <button
@@ -298,6 +315,11 @@ export default function PostReview() {
           {' '}
           Send Transaction{' '}
         </button>
+        <div> Current Verified CId in zkApp:</div>
+        {state.verifiedCIds?.map((ele,i)=>(
+          <div key={i}>{ele.toString()}</div>
+        ))}
+        <button onClick={onRefreshCurrentVerifiedCIds}> Get Latest State </button>
       </div>
     );
   }
