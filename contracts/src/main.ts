@@ -32,12 +32,14 @@ const deployTxn = await Mina.transaction(deployerAccount, () => {
 });
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
 
-const secret1 = Encoding.stringToFields('secret')[0];
+const secret1 = Encoding.stringToFields(
+  'By convention, the first transaction in a block is a special transaction that starts a new coin owned by the creator of the block. This adds an incentive for nodes to support the network, and provides a way to initially distribute coins into circulation, since there is no central authority to issue them. The steady addition of a constant of amount of new coins is analogous to gold miners expending resources to add gold to circulation. In our case, it is CPU time and electricity that is expended.'
+)[0];
 console.log('secret1', secret1.toString());
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.setSecret(secret1, secret1, secret1, secret1, secret1);
+    zkAppInstance.setSecret(secret1, secret1);
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -49,14 +51,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading1(
-      Field(1),
-      secret1,
-      secret1,
-      secret1,
-      secret1,
-      secret1
-    );
+    zkAppInstance.proveReading1(Field(1), secret1, secret1);
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -68,14 +63,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading2(
-      Field(2),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.proveReading2(Field(2), Field(secret1), Field(secret1));
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -89,14 +77,7 @@ try {
   const cId2 = zkAppInstance.verifiedCId2.get();
   if (cId2.toString() === '0') {
     const tx1 = await Mina.transaction(senderAccount, () => {
-      zkAppInstance.proveReading2(
-        Field(2),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1)
-      );
+      zkAppInstance.proveReading2(Field(2), Field(secret1), Field(secret1));
     });
     await tx1.prove();
     await tx1.sign([senderKey]).send();
@@ -105,14 +86,7 @@ try {
     console.log('the commentId on verifiedCId2:', _cId2.toString());
   } else {
     const tx1 = await Mina.transaction(senderAccount, () => {
-      zkAppInstance.proveReading3(
-        Field(3),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1),
-        Field(secret1)
-      );
+      zkAppInstance.proveReading3(Field(3), Field(secret1), Field(secret1));
     });
     await tx1.prove();
     await tx1.sign([senderKey]).send();
@@ -125,14 +99,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading4(
-      Field(4),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.proveReading4(Field(4), Field(secret1), Field(secret1));
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -144,14 +111,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading5(
-      Field(5),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.proveReading5(Field(5), Field(secret1), Field(secret1));
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -163,14 +123,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading6(
-      Field(6),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.proveReading6(Field(6), Field(secret1), Field(secret1));
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();
@@ -182,14 +135,7 @@ try {
 
 try {
   const tx1 = await Mina.transaction(senderAccount, () => {
-    zkAppInstance.proveReading7(
-      Field(7),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1),
-      Field(secret1)
-    );
+    zkAppInstance.proveReading7(Field(7), Field(secret1), Field(secret1));
   });
   await tx1.prove();
   await tx1.sign([senderKey]).send();

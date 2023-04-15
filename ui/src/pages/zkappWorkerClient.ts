@@ -85,22 +85,13 @@ export default class ZkappWorkerClient {
   createSetSecretTransaction({
     secret1,
     secret2,
-    secret3,
-    secret4,
-    secret5,
   }: {
     secret1: string;
     secret2: string;
-    secret3: string;
-    secret4: string;
-    secret5: string;
   }) {
     return this._call("createSetSecretTransaction", {
       secret1: Encoding.stringToFields(secret1)[0],
       secret2: Encoding.stringToFields(secret2)[0],
-      secret3: Encoding.stringToFields(secret3)[0],
-      secret4: Encoding.stringToFields(secret4)[0],
-      secret5: Encoding.stringToFields(secret5)[0],
     });
   }
 
@@ -108,24 +99,15 @@ export default class ZkappWorkerClient {
     cId,
     secret1,
     secret2,
-    secret3,
-    secret4,
-    secret5,
   }: {
     cId: number;
     secret1: string;
     secret2: string;
-    secret3: string;
-    secret4: string;
-    secret5: string;
   }) {
     return this._call("createProveReadingTransaction", {
       cId: Field(cId),
       secret1: Encoding.stringToFields(secret1)[0],
       secret2: Encoding.stringToFields(secret2)[0],
-      secret3: Encoding.stringToFields(secret3)[0],
-      secret4: Encoding.stringToFields(secret4)[0],
-      secret5: Encoding.stringToFields(secret5)[0],
     });
   }
 
