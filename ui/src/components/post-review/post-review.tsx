@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import { Grid, GridItem, Stack, Input, Button,Text,Heading, Container  } from "@chakra-ui/react"
+import { Grid, GridItem, Stack, Input, Button,Text,Heading, Container, List, ListItem, ListIcon  } from "@chakra-ui/react"
 import {
   Mina,
   isReady,
@@ -18,12 +18,15 @@ import "../../pages/reactCOIServiceWorker";
 
 import ZkappWorkerClient from "../../pages/zkappWorkerClient";
 import MintNFT from "../../abi/MintNFT.json";
+import { MdCheckCircle,MdCircle } from "react-icons/md";
 
 const transactionFee = 0.1;
 export const PostReview: FC = () => {
   const router = useRouter();
 
   const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
+
+  const comments = [{id: 1, bookId: 1, content: "This book is fantastic! It's the era of openness and transparency !", reviewer: "0xA09AD8cbA86AE23937e4e3E71F995F7C406a89ba"}, {id: 2, bookId: 1, content: "This book is not so good !", reviewer: "0xA09AD8cbA86AE23937e4e3E71F995F7C406a89ba"}, {id: 3, bookId: 1, content: "This is great !!", reviewer: "0xA09AD8cbA86AE23937e4e3E71F995F7C406a89ba"}]
 
   const [userAddress, setUserAddress] = useState('');
   const [review, setReview] = useState('');
@@ -97,6 +100,7 @@ export const PostReview: FC = () => {
       }
     }
     getBook();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
   let [state, setState] = useState({
@@ -113,23 +117,17 @@ export const PostReview: FC = () => {
 
   const [secret1, setSecret1] = useState<string>();
   const [secret2, setSecret2] = useState<string>();
-  const [secret3, setSecret3] = useState<string>();
-  const [secret4, setSecret4] = useState<string>();
-  const [secret5, setSecret5] = useState<string>();
   const [cId, setCId] = useState<number>();
 
   console.log(secret1, typeof secret1);
   console.log(secret2, typeof secret2);
-  console.log(secret3, typeof secret3);
-  console.log(secret4, typeof secret4);
-  console.log(secret5, typeof secret5);
 
   useEffect(() => {
     (async () => {
       await isReady;
       const { BookReview } = await import('../../../../contracts/build/src/');
 
-      const zkAppAddress = 'B62qrNeaM6SZBdqizf7PcQw488DPLvJGTeFKwEgp71yZZuMYDQikptv';
+      const zkAppAddress = 'B62qpaEuAKao4hVdToyFawbZVuhdJNLm4LCWKQARCXZUAtsLPDsj4Xa';
       // This should be removed once the zkAppAddress is updated.
       if (!zkAppAddress) {
         console.error(
@@ -172,7 +170,7 @@ export const PostReview: FC = () => {
         await zkappWorkerClient.compileContract();
         console.log('zkApp compiled');
         const zkappPublicKey = PublicKey.fromBase58(
-          'B62qrNeaM6SZBdqizf7PcQw488DPLvJGTeFKwEgp71yZZuMYDQikptv'
+          'B62qpaEuAKao4hVdToyFawbZVuhdJNLm4LCWKQARCXZUAtsLPDsj4Xa'
         );
         await zkappWorkerClient.initZkappInstance(zkappPublicKey);
         console.log('getting zkApp state...');
@@ -191,9 +189,10 @@ export const PostReview: FC = () => {
             x
         });
       }
+      state.zkappWorkerClient && await onRefreshCurrentVerifiedCIds()
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [state.zkappWorkerClient]);
 
   // -------------------------------------------------------
   // Wait for account to exist, if it didn't
@@ -225,8 +224,8 @@ export const PostReview: FC = () => {
     await state.zkappWorkerClient!.fetchAccount({
       publicKey: state.publicKey!
     });
-    if(!secret1 || !secret2 || !secret3 || !secret4 || !secret5)return;
-    await state.zkappWorkerClient!.createSetSecretTransaction({secret1,secret2,secret3,secret4,secret5});
+    if(!secret1 || !secret2)return;
+    await state.zkappWorkerClient!.createSetSecretTransaction({secret1,secret2});
     console.log('creating proof...');
     await state.zkappWorkerClient!.proveUpdateTransaction();
     console.log('getting Transaction JSON...');
@@ -252,8 +251,8 @@ export const PostReview: FC = () => {
       await state.zkappWorkerClient!.fetchAccount({
         publicKey: state.publicKey!
       });
-      if(!secret1 || !secret2 || !secret3 || !secret4 || !secret5 || !cId)return;
-      await state.zkappWorkerClient!.createProveReadingTransaction({cId, secret1,secret2,secret3,secret4,secret5});
+      if(!secret1 || !secret2 || !cId)return;
+      await state.zkappWorkerClient!.createProveReadingTransaction({cId, secret1,secret2,});
       console.log('creating proof...');
       await state.zkappWorkerClient!.proveUpdateTransaction();
       console.log('getting Transaction JSON...');
@@ -278,15 +277,6 @@ export const PostReview: FC = () => {
   }
   const handleChange2 = (e: { target: { value: string | undefined; }; }) => {
     setSecret2(() => e.target.value)
-  }
-  const handleChange3 = (e: { target: { value: string | undefined; }; }) => {
-    setSecret3(() => e.target.value)
-  }
-  const handleChange4 = (e: { target: { value: string | undefined; }; }) => {
-    setSecret4(() => e.target.value)
-  }
-  const handleChange5 = (e: { target: { value: string | undefined; }; }) => {
-    setSecret5(() => e.target.value)
   }
   const handleChangeCId = (e: { target: { value: string | undefined; }; }) => {
     setCId(() => Number(e.target.value))
@@ -378,16 +368,12 @@ export const PostReview: FC = () => {
 
         <Text>Q1. What is the fourth step to run the network ?</Text>
         <Input value={secret1} onChange={handleChange1} type="text"/>
-        <Text>Q2. What is the fourth step to run the network ?</Text>
-        <Input value={secret2} onChange={handleChange2} type="text"/>
-        <Text>Q3. Please copy and paste the text under the heading 6. Incentive</Text>
-        <Input value={secret3} onChange={handleChange3} type="text" height='5rem'/>
-        <Input value={secret4} onChange={handleChange4} type="text"/>
-        <Input value={secret5} onChange={handleChange5} type="text"/>
+        <Text>Q2. Please copy and paste the first paragraph under the heading 6. Incentive</Text>
+        <Input value={secret2} onChange={handleChange2} type="text" />
         <Text>Please input your commentId</Text>
         <Input value={cId} onChange={handleChangeCId} type="text"/>
           </Stack>
-        <Stack align='end' className={styles.minaTransactionStack}>
+        {/* <Stack align='end' className={styles.minaTransactionStack}>
 
         <Button 
         onClick={onSendSetSecretTransaction}
@@ -397,8 +383,8 @@ export const PostReview: FC = () => {
                     {' '}
           Send Transaction{' '}
         </Button>
-        </Stack>
-        <Stack align='end'>
+        </Stack> */}
+        <Stack align='end' className={styles.minaTransactionStack}>
 
         <Button
           onClick={onSendProveReadingTransaction}
@@ -460,6 +446,18 @@ export const PostReview: FC = () => {
             <Text fontSize='xl'>title: {bookTitle}</Text>
             <Text fontSize='md'>description: {bookDescription}</Text>
           </div>
+      </Stack>
+      <Stack>
+        <Text>Comments</Text>
+        <List>
+        {comments.map((comment,i)=>(
+          <ListItem key={i}>
+            {state.verifiedCIds?.includes(i+1) ? <ListIcon as={MdCheckCircle} color='green.500'/> : <ListIcon as={MdCircle} color='gray.500' />}
+          
+          {comment.content}
+        </ListItem>
+        ))}
+        </List>
       </Stack>
       <Stack direction="column" spacing={2} className={styles.formStack}>
         <Text>Comment !</Text>
