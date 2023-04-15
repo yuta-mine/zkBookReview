@@ -23,20 +23,30 @@ export default function PostReview() {
     hasWallet: null as null | boolean,
     hasBeenSetup: false,
     accountExists: false,
-    currentAdminAccount: null as null | PublicKey,
+    x: null as null | Field,
     publicKey: null as null | PublicKey,
     zkappPublicKey: null as null | PublicKey,
     creatingTransaction: false,
   });
 
-  const [privateKey, setPrivateKey] = useState<string>();
+  const [secret1, setSecret1] = useState<string>();
+  const [secret2, setSecret2] = useState<string>();
+  const [secret3, setSecret3] = useState<string>();
+  const [secret4, setSecret4] = useState<string>();
+  const [secret5, setSecret5] = useState<string>();
+
+  console.log(secret1, typeof secret1);
+  console.log(secret2, typeof secret2);
+  console.log(secret3, typeof secret3);
+  console.log(secret4, typeof secret4);
+  console.log(secret5, typeof secret5);
 
   useEffect(() => {
     (async () => {
       await isReady;
       const { BookReview } = await import('../../../../contracts/build/src/');
 
-      const zkAppAddress = 'B62qjiXpQjApqs9tKwnwthZExPgMKJKKGpYYfLkep7Rs5aYScZLrKhC';
+      const zkAppAddress = 'B62qrNeaM6SZBdqizf7PcQw488DPLvJGTeFKwEgp71yZZuMYDQikptv';
       // This should be removed once the zkAppAddress is updated.
       if (!zkAppAddress) {
         console.error(
@@ -79,14 +89,14 @@ export default function PostReview() {
         await zkappWorkerClient.compileContract();
         console.log('zkApp compiled');
         const zkappPublicKey = PublicKey.fromBase58(
-          'B62qjiXpQjApqs9tKwnwthZExPgMKJKKGpYYfLkep7Rs5aYScZLrKhC'
+          'B62qrNeaM6SZBdqizf7PcQw488DPLvJGTeFKwEgp71yZZuMYDQikptv'
         );
         await zkappWorkerClient.initZkappInstance(zkappPublicKey);
         console.log('getting zkApp state...');
         await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey })
-        const currentAdminAccount = await zkappWorkerClient.getAdminAccount();
+        const x = await zkappWorkerClient.getX();
 
-        console.log('current state:', currentAdminAccount);
+        console.log('current state:', x);
         setState({
             ...state,
             zkappWorkerClient,
@@ -95,7 +105,7 @@ export default function PostReview() {
             publicKey,
             zkappPublicKey,
             accountExists,
-            currentAdminAccount
+            x
         });
       }
     })();
@@ -132,11 +142,8 @@ export default function PostReview() {
     await state.zkappWorkerClient!.fetchAccount({
       publicKey: state.publicKey!
     });
-
-    console.log(privateKey);
-    
-    if(!privateKey)return;
-    await state.zkappWorkerClient!.createUpdateTransaction({privateKey: privateKey});
+    if(!secret1 || !secret2 || !secret3 || !secret4 || !secret5)return;
+    await state.zkappWorkerClient!.createSetSecretTransaction({secret1,secret2,secret3,secret4,secret5});
     console.log('creating proof...');
     await state.zkappWorkerClient!.proveUpdateTransaction();
     console.log('getting Transaction JSON...');
@@ -155,8 +162,20 @@ export default function PostReview() {
     setState({ ...state, creatingTransaction: false });
   }
 
-  const handleChange = (e: { target: { value: string | undefined; }; }) => {
-    setPrivateKey(() => e.target.value)
+  const handleChange1 = (e: { target: { value: string | undefined; }; }) => {
+    setSecret1(() => e.target.value)
+  }
+  const handleChange2 = (e: { target: { value: string | undefined; }; }) => {
+    setSecret2(() => e.target.value)
+  }
+  const handleChange3 = (e: { target: { value: string | undefined; }; }) => {
+    setSecret3(() => e.target.value)
+  }
+  const handleChange4 = (e: { target: { value: string | undefined; }; }) => {
+    setSecret4(() => e.target.value)
+  }
+  const handleChange5 = (e: { target: { value: string | undefined; }; }) => {
+    setSecret5(() => e.target.value)
   }
   // -------------------------------------------------------
 
@@ -167,9 +186,9 @@ export default function PostReview() {
     await state.zkappWorkerClient!.fetchAccount({
          publicKey: state.zkappPublicKey!
     })
-    const currentAdminAccount = await state.zkappWorkerClient!.getAdminAccount();
-    console.log('current state:', currentAdminAccount);
-    setState({ ...state, currentAdminAccount });
+    const x = await state.zkappWorkerClient!.getX();
+    console.log('current state:', x);
+    setState({ ...state, x });
   }
   // -------------------------------------------------------...
 
@@ -224,7 +243,11 @@ export default function PostReview() {
     mainContent = (
       <div>
         <h3>set admin account</h3>
-        <input value={privateKey} onChange={handleChange} type="text"/>
+        <input value={secret1} onChange={handleChange1} type="text"/>
+        <input value={secret2} onChange={handleChange2} type="text"/>
+        <input value={secret3} onChange={handleChange3} type="text"/>
+        <input value={secret4} onChange={handleChange4} type="text"/>
+        <input value={secret5} onChange={handleChange5} type="text"/>
         <button
           onClick={onSendTransaction}
           disabled={state.creatingTransaction}
@@ -232,7 +255,7 @@ export default function PostReview() {
           {' '}
           Send Transaction{' '}
         </button>
-        {/* <div> Current Number in zkApp: {state.currentAdminAccount?.toBase58()} </div> */}
+        <div> Current Number in zkApp: {state.x?.toString()} </div>
         <button onClick={onRefreshCurrentNum}> Get Latest State </button>
         <h3>set secret</h3>
 
