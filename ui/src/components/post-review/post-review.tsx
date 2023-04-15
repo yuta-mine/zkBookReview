@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import { Grid, GridItem, Stack, Input, Button,Text,Heading  } from "@chakra-ui/react"
+import { Grid, GridItem, Stack, Input, Button,Text,Heading, Container  } from "@chakra-ui/react"
 import {
   Mina,
   isReady,
@@ -371,9 +371,9 @@ export const PostReview: FC = () => {
   let mainContent;
   if (state.hasBeenSetup && state.accountExists) {
     mainContent = (
-      <div>
-        <Heading as='h2' size='2xl'>set secret</Heading>
-        <Heading as='h2' size='2xl'>ZKP to verify whether you have truly read this book</Heading>
+      <Container maxW='2xl'>
+        {/* <Heading as='h2' size='2xl'>set secret</Heading> */}
+        <Heading as='h2' size='2xl'>ZKP</Heading>
         <Text>Q1. What is the fourth step to run the network ?</Text>
         <Input value={secret1} onChange={handleChange1} type="text"/>
         <Text>Q2. What is the fourth step to run the network ?</Text>
@@ -384,6 +384,8 @@ export const PostReview: FC = () => {
         <Input value={secret5} onChange={handleChange5} type="text"/>
         <Text>Please input your commentId</Text>
         <Input value={cId} onChange={handleChangeCId} type="text"/>
+        <Stack align='end'>
+
         <Button 
         onClick={onSendSetSecretTransaction}
         disabled={state.creatingTransaction}     
@@ -391,13 +393,17 @@ export const PostReview: FC = () => {
                     {' '}
           Send Transaction{' '}
         </Button>
+        </Stack>
+        <Stack align='end'>
+
         <Button
           onClick={onSendProveReadingTransaction}
           disabled={state.creatingTransaction}
-        >
+          >
           {' '}
           Send Transaction{' '}
         </Button>
+          </Stack>
         <div> Current Number in zkApp: {state.x?.toString()} </div>
         <button onClick={onRefreshCurrentHash}> Get Latest State </button>
       
@@ -406,7 +412,7 @@ export const PostReview: FC = () => {
           <div key={i}>{ele.toString()}</div>
         ))}
         <button onClick={onRefreshCurrentVerifiedCIds}> Get Latest State </button>
-      </div>
+      </Container>
     );
   }
 
