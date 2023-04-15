@@ -168,7 +168,7 @@ export const NFTList: FC = () => {
     <div className={styles.list}>
       {nfts?.map((nft, i) => {
         const id = nft.id.toString();
-        return <MyCards nft={nft} key={i} buy={buyNFT.bind(id)} />;
+        return <MyCards nft={nft} key={i} buy={() => buyNFT(id)} />;
       })}
     </div>
   );
