@@ -12,16 +12,13 @@ require('dotenv').config();
 
 const config: HardhatUserConfig = {
 	solidity: '0.8.18',
-	defaultNetwork: "hardhat",
+	defaultNetwork: 'hardhat',
 	networks: {
 		hardhat: {},
-		alfajores: {
-			url: 'https://alfajores-forno.celo-testnet.org',
-			accounts: {
-				mnemonic: process.env.MNEMONIC,
-				path: "m/44'/60'/0'/0",
-			},
-			chainId: 44787,
+		scrollAlpha: {
+		  url: 'https://alpha-rpc.scroll.io/12' || '',
+		  accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+		  chainId: 534353,
 		},
 		localhost: {
 			url: 'http://localhost:8545',
