@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { FC } from 'react';
-import styles  from './styles/style.module.css';
+import styles from './styles/style.module.css';
 
 export const Header: FC = () => {
   return (

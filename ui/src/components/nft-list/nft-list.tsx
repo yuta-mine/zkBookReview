@@ -19,6 +19,7 @@ import {
 
 import styles from "./styles/style.module.css";
 import MintNFT from "../../abi/MintNFT.json";
+import { mintContractAddress } from '../../utils/address'
 
 interface NFT {
   id: string;
@@ -32,51 +33,19 @@ interface Comment {
   content: string;
 }
 
-export const NFTList: FC = () => {
-  const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
+type Props = {
+  provider: ethers.providers.Web3Provider | undefined;
+  connectWallet: () => Promise<void>
+  currentAccount: string;
+};
 
-
-
+export const NFTList: FC<Props> = (props) => {
+  const { provider, connectWallet, currentAccount } = props;
   const [nfts, setNFTs] = useState<NFT[]>([]);
   const [comments, setComments] = useState<string[][]>([]);
 
-  // -----------------------------------
-  const [userAddress, setUserAddress] = useState("");
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
-
-  useEffect(() => {
-    const connectWallet = async () => {
-      try {
-        const { ethereum } = window as any;
-        if (!ethereum) {
-          throw new Error("Please install MetaMask!");
-        } else {
-          console.log("MetaMask is installed!", ethereum);
-        }
-
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        setProvider(provider);
-
-        const accounts = await provider.listAccounts();
-        const currentAccount = accounts[0];
-        setUserAddress(currentAccount);
-
-        const connectedChainId = await provider
-          .getNetwork()
-          .then((network) => network.chainId);
-        await ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ethers.utils.hexValue(connectedChainId) }],
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    connectWallet();
-  }, [userAddress]);
-
   // load -----------------------------------
-  const loadNfts = async () => {
+  const loadNfts = async (provider: ethers.providers.Web3Provider | undefined) => {
     try {
       const { ethereum } = window as any;
       if (!ethereum) {
@@ -84,11 +53,13 @@ export const NFTList: FC = () => {
       } else {
         console.log("MetaMask is installed!", ethereum);
       }
-
-      const provider = new ethers.providers.Web3Provider(ethereum);
+      if (!provider) {
+        return
+      }
+      // const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(
-        contractAddress,
+        mintContractAddress,
         MintNFT.abi,
         signer
       );
@@ -101,8 +72,8 @@ export const NFTList: FC = () => {
     }
   };
   useEffect(() => {
-    loadNfts();
-  }, []);
+    loadNfts(provider);
+  }, [provider]);
   // -----------------------------------
 
   // buy -----------------------------------
@@ -118,13 +89,12 @@ export const NFTList: FC = () => {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(
-        contractAddress,
+        mintContractAddress,
         MintNFT.abi,
         signer
       );
       const res = await contract.purchase(ethers.BigNumber.from(tokenId));
-      await loadNfts();
-      console.log(nfts);
+      await loadNfts(provider);
       console.log("res: ", res);
     } catch (e) {
       console.log("エラー", e);
@@ -145,7 +115,7 @@ export const NFTList: FC = () => {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(
-        contractAddress,
+        mintContractAddress,
         MintNFT.abi,
         signer
       );
@@ -168,6 +138,7 @@ export const NFTList: FC = () => {
 
   return (
     <div className={styles.list}>
+      {currentAccount ? currentAccount : <Button onClick={connectWallet}>Connect</Button>}
       {nfts?.map((nft, i) => {
         const id = nft.id.toString();
         return <MyCards nft={nft} key={i} buy={() => buyNFT(id)} />;
@@ -177,11 +148,11 @@ export const NFTList: FC = () => {
 };
 
 // buyNFT.bind(nft.id)
-interface Props {
+interface CardProps {
   nft: NFT;
   buy: () => {};
 }
-function MyCards({ nft, buy }: Props) {
+function MyCards({ nft, buy }: CardProps) {
   return (
     <Card maxW="sm">
       <CardBody>
