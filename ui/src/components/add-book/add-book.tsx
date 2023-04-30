@@ -1,10 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import {ethers} from "ethers";
 import MintNFT from "../../abi/MintNFT.json";
+import {mintContractAddress} from '../../utils/address'
 
 export const AddBook: FC = () => {
-  const contractAddress = "0x1dbb068EF9c4C73F086DBec28aAa6F79CCb5F499";
-
   // -----------------------------------
   const [userAddress, setUserAddress] = useState('');
   const [title, setTitle] = useState('');
@@ -54,7 +53,7 @@ export const AddBook: FC = () => {
 
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, MintNFT.abi, signer);
+      const contract = new ethers.Contract(mintContractAddress, MintNFT.abi, signer);
       const res = await contract.addBook(title, description, imageId);
       console.log("res: ", res)
     } catch (e) {
